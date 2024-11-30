@@ -19,7 +19,7 @@ class ArticleSeeder extends Seeder
                 'name'=>$article->name,
                 'desc'=>$article->desc,
                 'date'=>$article->date,
-                'user_id'=>random_int(1,10)
+                'user_id'=>1
             ]);
         }
     }

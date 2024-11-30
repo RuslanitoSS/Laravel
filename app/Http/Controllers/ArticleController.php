@@ -6,6 +6,9 @@ use App\Models\Article;
 use App\Models\User;
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ArticleNotificationMail;
 
 class ArticleController extends Controller
 {
@@ -31,20 +34,28 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
+        Gate::authorize('create', [self::class]);
+    
         $request->validate([
-            'date'=>'date',
-            'name'=>'required|min:5|max:100',
-            'desc'=>'required|min:5'
+            'date' => 'date',
+            'name' => 'required|min:5|max:100',
+            'desc' => 'required|min:5'
         ]);
+    
         $article = new Article;
         $article->date = $request->date;
         $article->name = $request->name;
         $article->desc = $request->desc;
         $article->user_id = 1;
         $article->save();
+    
+        $readers = User::where('role', 'reader')->pluck('email');
+        foreach ($readers as $email) {
+            Mail::to($email)->send(new ArticleNotificationMail($article));
+        }
+      
         return redirect('/article');
     }
-
     /**
      * Display the specified resource.
      */
@@ -69,6 +80,7 @@ class ArticleController extends Controller
      */
     public function update(Request $request, Article $article)
     {
+        Gate::authorize('update',$article);
         $request->validate([
             'date'=>'date',
             'name'=>'required|min:5|max:100',
@@ -87,6 +99,7 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
+        Gate::authorize('delete',$article);
         if ($article->delete()) return redirect('/article')->with('status','Delete success');
         else return redirect()->route('article.show', ['article'=>$article->id])->with('status','Delete don`t success');
     }
