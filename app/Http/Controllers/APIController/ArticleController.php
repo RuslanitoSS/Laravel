@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\APIController;
 
 use App\Models\Article;
 use App\Models\User;
@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Gate;
 use App\Events\NewArticleEvent;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 
 
 class ArticleController extends Controller
@@ -23,7 +24,8 @@ class ArticleController extends Controller
         $articles = Cache::remember('articles'.$page, 3000, function(){
             return Article::latest()->paginate(6);
         });
-        return view('article.index', ['articles'=> $articles]);
+        // return view('article.index', ['articles'=> $articles]);
+        return response()->json($articles);
     }
 
     /**
@@ -56,7 +58,8 @@ class ArticleController extends Controller
         $article->user_id = 1;
         if ($article->save()) {
             NewArticleEvent::dispatch($article);
-            return redirect('/article');
+            // return redirect('/article');
+            return response()->json(1);
         }
     }
 
@@ -76,7 +79,8 @@ class ArticleController extends Controller
                 'user'=>$user
             ];
         });
-        return view('article.show', ['article'=>$article, 'user'=>$result['user'], 'comments'=>$result['comments']]);
+        // return view('article.show', ['article'=>$article, 'user'=>$result['user'], 'comments'=>$result['comments']]);
+        return response()->json($result);
 
     }
 
@@ -86,7 +90,8 @@ class ArticleController extends Controller
     public function edit(Article $article)
     {
 
-        return view('article.update', ['article'=>$article]);
+        // return view('article.update', ['article'=>$article]);
+        return response()->json($article);
     }
 
     /**
@@ -108,8 +113,8 @@ class ArticleController extends Controller
         $article->name = $request->name;
         $article->desc = $request->desc;
         $article->user_id = 1;
-        if ($article->save()) return redirect('/article')->with('status','Update success');
-        else return redirect()->route('article.index')->with('status','Update don`t success');
+        if ($article->save()) return response()->json(1);
+        else return response()->json(0);
     }
 
     /**
@@ -119,7 +124,7 @@ class ArticleController extends Controller
     {
         Cache::flush();
         Gate::authorize('delete', $article);
-        if ($article->delete()) return redirect('/article')->with('status','Delete success');
-        else return redirect()->route('article.show', ['article'=>$article->id])->with('status','Delete don`t success');
+        if ($article->delete()) return response(1);
+        else return response()->json($article);
     }
 }

@@ -2,30 +2,25 @@
 
 namespace App\Mail;
 
-use App\Models\Article;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Address;
 
-class ArticleNotification extends Mailable
+
+class ClickMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(public Article $article)
+    public function __construct(public $article_count, public $comment_count)
     {
-    }
-
-    public function build()
-    {
-        return $this->subject('Новая статья опубликована!')
-            ->view('emails.article-notification')
-            ->with(['article' => $this->article]);
+        
     }
 
     /**
@@ -34,7 +29,8 @@ class ArticleNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Article Notification',
+            from: new Address(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME')),
+            subject: 'Click Mail',
         );
     }
 
@@ -44,7 +40,11 @@ class ArticleNotification extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            markdown: 'mail.click-shipped',
+            with:[
+                'article_count'=>$this->article_count,
+                'comment_count'=>$this->comment_count,
+            ]
         );
     }
 

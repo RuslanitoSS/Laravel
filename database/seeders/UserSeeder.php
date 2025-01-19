@@ -14,11 +14,17 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
+        /* User::create([
             'name'=>'moderator',
             'email'=>'admin@mail.ru',
             'password'=>Hash::make('123456'),
             'role'=>'moderator'
-        ]);
+        ]); */
+        /* User::create([
+            'name'=>'ModerPidoras',
+            'email'=>'suprorusya@mail.ru',
+            'password'=>Hash::make('Klauss'),
+            'role'=>'moderator'
+        ]); */
     }
 }

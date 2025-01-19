@@ -26,13 +26,17 @@ Route::get('/auth/logout', [AuthController::class, 'logout']);
 
 //Article
 Route::resource('article', ArticleController::class)->middleware('auth:sanctum');
+Route::get('/article/{article}', [ArticleController::class, 'show'])->name('article.show')->middleware('checkclick');
 
 //Comment
 Route::controller(CommentController::class)->prefix('/comment')->middleware('auth:sanctum')->group(function(){
-    Route::post('','store');
-    Route::get('/{id}/edit', 'edit');
-    Route::post('/{comment}/update', 'update');
-    Route::get('/{id}/delete', 'delete');
+    Route::post('','store')->name('comment.store');
+    Route::get('/{id}/edit', 'edit')->name('comment.edit');
+    Route::post('/{comment}/update', 'update')->name('comment.update');
+    Route::get('/{comment}/destroy', 'destroy')->name('comment.destroy');
+    Route::get('/index','index')->name('comment.index');
+    Route::get('/{comment}/accept', 'accept')->name('comment.accept');
+    Route::get('/{comment}/reject', 'reject')->name('comment.reject');
 });
 
 
@@ -41,13 +45,15 @@ Route::get('galery/{img}/{name}', function($img, $name){
     return view('main.galery', ['img'=>$img, 'name'=>$name]);
 });
 
-
+// Route::get('/', function () {
+//         return view('layout');
+//     });
 
 Route::get('/about', function(){
     return view('main.about');
 });
 
-Route::get('/contact', function(){
+Route::get('/contacts', function(){
     $data = [
         'city'=>'Moscow',
         'street'=>'Semenovskaya',
@@ -55,3 +61,7 @@ Route::get('/contact', function(){
     ];
     return view('main.contact', ['data'=>$data]);
 });
+
+// Route::get('/', function () {
+//     return view('welcome');
+// });
